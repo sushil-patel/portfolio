@@ -1,0 +1,58 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SEO, { type Props as SEOProps } from '../components/SEO.astro';
+import '../styles/global.css';
+
+export interface Props {
+  seo?: SEOProps;
+  containerClass?: string;
+}
+
+const { seo, containerClass = 'max-w-6xl' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <SEO {...seo} />
+    <!-- Inline Theme Initializer to prevent Flash of Unstyled Content (FOUC) and 0 CLS -->
+    <script is:inline>
+      (function () {
+        const storedTheme = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="flex min-h-screen flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-indigo-100 dark:selection:bg-indigo-950 selection:text-indigo-900 dark:selection:text-indigo-200">
+    <!-- Accessible Skip Link -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-slate-900 dark:focus:bg-slate-100 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white dark:focus:text-slate-900 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    >
+      Skip to main content
+    </a>
+
+    <!-- Top Navigation -->
+    <Header />
+
+    <!-- Main Content Area -->
+    <main id="main-content" class={`mx-auto w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8 ${containerClass}`}>
+      <slot />
+    </main>
+
+    <!-- Global Footer -->
+    <Footer />
+  </body>
+</html>

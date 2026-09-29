@@ -1,0 +1,90 @@
+---
+title: "Diyan Exports – Agro-Commodity Platform & Catalog API"
+description: "Production web platform and catalog service built for an international agro-commodity export firm, featuring a Spring Boot REST API, JPA persistence with custom JSON converters, and automated inquiry dispatch."
+featured: true
+order: 1
+date: "Aug 2026 – Present"
+role: "Backend & System Developer"
+technologies:
+  - "Java"
+  - "Spring Boot"
+  - "Spring Data JPA"
+  - "REST APIs"
+  - "MySQL"
+  - "Docker"
+  - "Jakarta Mail"
+category: "Web Application"
+githubUrl: "https://github.com/sushil-patel/diyan-exports"
+metrics:
+  - label: "Product Catalog"
+    value: "40+ Items"
+  - label: "Architecture"
+    value: "Layered REST Service"
+  - label: "Inquiry Handling"
+    value: "Automated Dispatch"
+  - label: "Persistence"
+    value: "MySQL & JPA"
+architectureOverview: "Layered Spring Boot REST API service backed by MySQL relational storage with custom JSON converters for dynamic specifications and asynchronous notification dispatch."
+---
+
+## 1. Project Overview
+
+**Diyan Exports** is a production-oriented web platform built for an international agro-commodity and spice exporter based in India. The platform serves as both a digital product showcase—encompassing seeds, ground spices, grains, and pulses—and a commercial customer lead pipeline enabling global importers to submit structured quotation requests.
+
+The system focuses on reliable backend engineering: designing clean RESTful contracts, robust domain data modeling with **Spring Data JPA**, custom JSON attribute converters for dynamic commodity specifications, and an automated inquiry processing pipeline.
+
+---
+
+## 2. Problem Statement
+
+Agricultural commodity export businesses face distinct technical requirements:
+
+1. **Information-Dense Product Specifications:** Spices and grains require detailed technical parameters (purity percentages, moisture content, processing grades, and origin certification) that vary widely across commodity classes.
+2. **Structured Lead Capture & Validation:** Generic contact forms often produce incomplete trade inquiries. The system needed structured validation for product selections, required volumes, packaging choices, and contact verification.
+3. **Data Integrity & Traceability:** Inquiries must be persisted reliably with timestamps and customer details for audit and sales desk follow-ups, with instant notification dispatch.
+
+---
+
+## 3. Architecture & System Flow
+
+The backend service is structured with clear layer boundaries:
+
+```
+[ Web Clients / Global Importers ]
+             │
+             ▼ (JSON REST APIs)
+[ Spring Boot REST Controllers ]
+   ├── PublicController (Product listings & categories)
+   ├── EnquiryController (Quotation validation & submission)
+   ├── AdminController (Catalog administration)
+   └── EmailService (Automated lead notifications)
+             │
+             ▼ (Business Logic & Transactions)
+[ Service Layer & Validators ]
+   ├── ProductService / CategoryService
+   ├── EnquiryService (DTO mapping & validation)
+   └── MailNotificationService (Asynchronous dispatch)
+             │
+             ▼ (Spring Data JPA / Hibernate)
+[ MySQL Relational Storage ]
+   ├── Products & Categories (Normalized relational tables)
+   ├── Custom JSON Converters (Flexible commodity attributes)
+   └── Customer Inquiries (Persisted for audit & CRM export)
+```
+
+---
+
+## 4. Backend Engineering Highlights
+
+- **Spring Boot REST APIs:** Structured with strict controller-service-repository layer boundaries (`ProductController`, `ProductService`, `ProductRepository`), ensuring clean separation of concerns and maintainability.
+- **JPA Auditing & Metadata:** Incorporated `@MappedSuperclass Auditable` and `SecurityAuditorAware` for tracking entity creation, update timestamps, and modification history.
+- **Custom JSON Converters:** Developed `JsonStringListConverter` and `JsonStringMapConverter` using Jackson, allowing flexible product specification attributes (e.g. moisture % thresholds, grain length ranges) to be stored cleanly in MySQL without over-normalizing sparse metadata.
+- **Data Seeding & Migration:** Utilized `DatabaseSeeder` and structured `data.sql` to populate initial product taxonomies, grading scales, and certification entries reliably during bootstrapping.
+- **Asynchronous Email Notification:** Integrated `EmailService` using Jakarta Mail to deliver structured quotation receipts directly to the sales desk upon submission without blocking client HTTP responses.
+
+---
+
+## 5. Key Outcomes & Design Decisions
+
+- **Clean RESTful Contract Design:** Documented predictable API endpoints for catalog queries and quotation intake, making integration straightforward.
+- **Resilient Data Storage:** Storing both normalized category trees and flexible attribute JSON fields struck the right balance between relational integrity and schema agility.

@@ -1,0 +1,40 @@
+---
+title: "CLI Automation & Dev Utilities"
+description: "Lightweight terminal-based system utility engineered for scheduled alerts, asynchronous timers, and developer workflow automation."
+featured: false
+order: 5
+date: "Sep 2026"
+role: "Developer"
+technologies:
+  - "Python"
+  - "CLI Automation"
+  - "Async Timers"
+  - "System Audio"
+category: "Developer Utility"
+githubUrl: "https://github.com/sushil-patel/cli-alarm"
+metrics:
+  - label: "Resource Footprint"
+    value: "< 15MB RAM"
+  - label: "Interface"
+    value: "Pure Terminal"
+architectureOverview: "Lightweight command-line background daemon handling system timers, interrupt signals, and audio notification dispatch."
+---
+
+## 1. Project Overview
+
+**CLI Alarm** is a focused command-line utility built to automate focus intervals, deployment timer alarms, and developer alert notifications directly from the terminal without bloated GUI background processes.
+
+---
+
+## 2. Key Features & Implementation
+
+- **Low-Overhead Execution:** Runs with minimal RAM overhead (< 15MB), making it ideal for background terminal multiplexers (tmux/screen) during lengthy server operations.
+- **Graceful Signal Handling:** Captures `SIGINT` and `SIGTERM` signals to allow clean terminal exits without leaving orphaned timer threads.
+- **Asynchronous Dispatch:** Non-blocking timer loops that decouple system sleep intervals from prompt listeners.
+
+---
+
+## 3. Technology Stack
+
+- **Language:** Python
+- **Ecosystem:** POSIX / Windows audio hooks, Command-line argument parsing

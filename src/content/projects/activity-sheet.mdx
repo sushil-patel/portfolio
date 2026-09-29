@@ -1,0 +1,52 @@
+---
+title: "ActivitySheet – Employee Timesheet & Work Tracking Service"
+description: "Enterprise Spring Boot microservice enabling employees to log working hours and activity descriptions, featuring custom JPA DAO implementations and centralized exception handling."
+featured: false
+order: 4
+date: "Jun 2025 – Jul 2026"
+role: "Software Developer"
+technologies:
+  - "Java"
+  - "Spring Boot"
+  - "Spring Data JPA"
+  - "REST APIs"
+  - "MySQL"
+  - "DAO Pattern"
+category: "Backend Service"
+githubUrl: "https://github.com/sushil-patel/ActivitySheet"
+metrics:
+  - label: "Architecture"
+    value: "DAO + Service"
+  - label: "Validation"
+    value: "Custom Handler"
+architectureOverview: "REST API service utilizing layered architecture (Controller, Service, JPA DAO Implementation) with structured employee activity persistence in MySQL."
+---
+
+## 1. Project Overview
+
+**ActivitySheet** is a Spring Boot backend microservice designed for enterprise time tracking and labor auditing. It allows employees to log their daily working hours, task descriptions, and project associations while providing administrative endpoints to query and audit departmental time expenditures.
+
+---
+
+## 2. Key Technical Implementations
+
+- **Layered Architecture:** Built following the classic Spring enterprise architecture—decoupling REST controllers (`EmployeeDataController`), service interfaces (`ActivitySheetService`), and persistent data access (`EmployeeDaoJpaImpl`).
+- **Custom JPA DAO Implementation:** Implemented explicit `EntityManager` interactions to handle custom transactional boundaries and query aggregations across employee activity entities.
+- **Centralized Exception Handling:** Engineered `ActivitySheetExceptionHandler` to intercept `EmployeeNotFoundException` and runtime constraints, returning standardized `EmployeeErrorResponse` payloads with HTTP 404/400 statuses.
+- **Cross-Origin Configuration:** Structured `WebConfig` with explicit CORS mappings to securely integrate with disparate internal client applications and dashboards without wildcard vulnerabilities.
+
+---
+
+## 3. Technology Stack
+
+- **Language:** Java
+- **Framework:** Spring Boot, Spring MVC
+- **Persistence:** Spring Data JPA, Hibernate, MySQL
+- **Testing:** JUnit, Mockito
+- **Build Tool:** Maven
+
+---
+
+## 4. Engineering Impact
+
+ActivitySheet demonstrates clean code organization, effective Spring Boot request-response lifecycles, database transactions, bean configuration, and clean exception mapping.

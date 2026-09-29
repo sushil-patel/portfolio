@@ -1,0 +1,135 @@
+---
+title: "Artifact Comparison & Deployment Validation Tool"
+description: "High-performance archive verification engine created to eliminate a 2.5-hour manual Beyond Compare bottleneck in enterprise staging-to-production releases. Formally adopted by the delivery module, featuring an upcoming AI-powered GitLab OTBI reconciliation pipeline."
+featured: true
+order: 3
+date: "Feb 2026 – Present"
+role: "Creator & Lead Developer"
+technologies:
+  - "Java"
+  - "Python"
+  - "Streaming Archive Parser"
+  - "SHA-256 Hashing"
+  - "GitLab REST API"
+  - "LangChain4j / GenAI"
+  - "CI/CD Automation"
+category: "Enterprise & DevOps Tool"
+metrics:
+  - label: "Verification Time"
+    value: "2.5h → <3m"
+  - label: "Release Speedup"
+    value: "50x Faster"
+  - label: "Adoption"
+    value: "Enterprise Pipeline"
+  - label: "AI Roadmap"
+    value: "OTBI & GitLab Skim"
+architectureOverview: "Streaming in-memory archive inspection and SHA-256 chunk-level hashing with upcoming LLM-assisted manifest validation and automated GitLab bug-branch skimming."
+---
+
+## 1. Project Genesis & Origin Story
+
+During enterprise deployment cycles at Tata Consultancy Services (TCS), promoting release candidate builds from the staging environment to production was constrained by a critical verification bottleneck: **artifact parity validation**.
+
+This project started as an autonomous personal engineering initiative by Sushil. Observing that deployment engineers were losing valuable release window hours waiting on desktop comparison tools to inspect multi-gigabyte enterprise archives, Sushil designed and implemented a purpose-built comparison engine.
+
+After proving its speed and deterministic accuracy across staging runs, the enterprise project module formally acquired the tool, integrating it as a standardized pre-deployment gateway and awarding Sushil a **Special Initiative Award**.
+
+---
+
+## 2. The Bottleneck: The 2.5-Hour Beyond Compare Constraint
+
+In regulated enterprise environments, release governance mandates 100% verification that the binary build artifact promoted to production contains *only* authorized, tested code deltas.
+
+```
+[ Developer Commits ] ──> [ Staging Build (WAR/EAR) ] ──> [ Manual Beyond Compare ] (2.5+ Hours) ──> [ Production Deployment ]
+                                                                     │
+                                                           Desktop I/O Freeze
+                                                           High Memory Pressure
+                                                           Release Window Risk
+```
+
+### Challenges Faced with Legacy Tools:
+1. **Massive Archive Footprint:** Enterprise WAR and EAR files spanned gigabytes and contained hundreds of nested third-party libraries, compiled `.class` files, Spring bean definitions, and properties.
+2. **Exhaustive Disk I/O & UI Freezes:** Legacy GUI utilities like Beyond Compare required decompressing the entire archive to local disk drives before running comparisons. Decompressing, traversing, and hashing nested archives on developer and release manager machines took **over 2.5 hours** for the largest archive packages.
+3. **Late-Night Release Delays:** When unexpected bytecode differences were surfaced at 2:00 AM, engineers had to manually trace Git commit logs to determine if a class file belonged to a recent staging bug fix or was an unintended inclusion.
+
+---
+
+## 3. The Engineering Solution: Stream-Based Delta Engine
+
+To eliminate disk I/O latency, Sushil engineered a headless, high-throughput verification tool built on in-memory stream processing and cryptographic hashing:
+
+```
+[ Candidate Staging Archive ]        [ Baseline Production Archive ]
+             │                                      │
+             └───────────────┬──────────────────────┘
+                             ▼
+              [ Streaming Archive Unpacker ]
+              (ZipInputStream / JarInputStream in-memory)
+                             │
+                             ▼
+              [ Deterministic SHA-256 Hashing ]
+              (Normalizes timestamps, compares bytecode)
+                             │
+                             ▼
+              [ Parallel Delta Classifier ]
+              (Isolates Added / Removed / Altered Objects)
+                             │
+                             ▼
+              [ Instant Parity Report: < 3 Minutes ]
+```
+
+### Key Engineering Optimizations:
+- **In-Memory Streaming Inspection:** Leveraged `ZipInputStream` and `JarInputStream` to read nested archive entries sequentially in memory without unpacking entire multi-gigabyte files to disk, reducing disk I/O bottlenecks to near zero.
+- **Timestamp Normalization & Bytecode Checksums:** Standard zip utilities flag files as modified if their creation or zip timestamps differ. The engine strips transient zip metadata and computes deterministic **SHA-256 checksums** of raw bytecode and configuration content.
+- **Parallel Chunk Processing:** Leveraged worker threads to process independent archive entries concurrently, slashing total validation time from **2.5 hours down to under 3 minutes** (a 50x speedup).
+
+---
+
+## 4. Next-Gen Roadmap: AI-Powered "Objects to be Installed" (OTBI) Reconciler
+
+The next phase of the tool integrates Generative AI and automated source-control telemetry to transform the utility from a binary difference checker into an autonomous release auditor:
+
+```
+[ Developer OTBI Manifest ]                [ Detected Bytecode Diffs ]
+(Jira IDs, Declared Classes)                          │
+             │                                        │
+             └─────────────────┬──────────────────────┘
+                               ▼
+            [ LangChain4j / GenAI Semantic Reconciler ]
+            ├── Confirms declared objects match binary diffs
+            └── Flags unexpected / missing deltas
+                               │
+               (If unexpected diff detected)
+                               ▼
+            [ Automated GitLab Bug-Branch Skimmer ]
+            ├── Queries GitLab REST API for project repositories
+            ├── Skims recent staging bug branches sorted by date
+            └── Verifies if diff originated from approved bug fix
+                               │
+                               ▼
+            [ Automated Executive Release Audit Report ]
+```
+
+### Planned AI & Integration Architecture:
+
+1. **Semantic OTBI Manifest Parsing:**
+   Developers submit an **"Objects to be Installed" (OTBI)** manifest detailing the Jira defect IDs, target package names, configuration keys, and compiled classes intended for the release. Using an LLM-assisted parser (via **LangChain4j**), the system extracts structured entity lists from varied developer documentation formats.
+
+2. **Intent-Driven Diff Filtering:**
+   The AI engine correlates bytecode diffs against developer-declared intent. Purely compiler-generated synthetic methods, serialVersionUID deltas, or approved dependency upgrades are categorized intelligently, filtering out noise.
+
+3. **Automated GitLab Bug-Branch Skimming:**
+   If an artifact delta appears in the build that is **not** present in the developer's OTBI manifest:
+   - The engine automatically invokes the **GitLab REST API**.
+   - It queries all active staging branches, filtering by naming pattern (`bugfix/*`, `staging-patch/*`) and sorting chronologically by commit timestamp (`date-wise bug branches`).
+   - It scans commit diffs to identify which recent patch or emergency bug-fix branch introduced the object.
+   - It outputs an actionable audit trail for the Release Manager: *"Class `PaymentGatewayAdapter.class` was not in developer OTBI, but matches commit `a4f89b` on branch `bugfix/stg-2024-10-12` by Engineer X."*
+
+---
+
+## 5. Measurable Outcomes & Impact
+
+- **Drastic Cycle Reduction:** Slashed critical-path staging-to-production artifact comparison time from **2.5 hours to under 3 minutes**, saving hundreds of engineer-hours across release cycles.
+- **Organizational Adoption:** Formally acquired by the project module and embedded into standard enterprise release verification runbooks.
+- **Recognition:** Earned a **Special Initiative Award** at TCS for proactive technical innovation that eliminated a high-friction release bottleneck.

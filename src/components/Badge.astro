@@ -1,0 +1,29 @@
+---
+export interface Props {
+  text: string;
+  variant?: 'default' | 'accent' | 'subtle' | 'mono' | 'metric';
+  size?: 'sm' | 'md';
+}
+
+const { text, variant = 'default', size = 'sm' } = Astro.props;
+
+const variantClasses = {
+  default: 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700',
+  accent: 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-800 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 font-medium',
+  subtle: 'bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 border-slate-200/80 dark:border-slate-800',
+  mono: 'font-mono bg-slate-900 dark:bg-slate-100 text-slate-100 dark:text-slate-900 border-slate-800 dark:border-slate-200 tracking-tight',
+  metric: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-200 border-indigo-300 dark:border-indigo-800 font-semibold tracking-tight',
+};
+
+const sizeClasses = {
+  sm: 'text-xs px-2.5 py-0.5 rounded-md',
+  md: 'text-sm px-3 py-1 rounded-md',
+};
+---
+
+<span
+  class={`inline-flex items-center gap-1 border transition-colors duration-150 ${variantClasses[variant]} ${sizeClasses[size]}`}
+>
+  <slot name="icon" />
+  {text}
+</span>

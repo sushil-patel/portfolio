@@ -1,0 +1,231 @@
+---
+title: "Claimora – Mock Insurance Claim Processing Platform"
+description: "Production-grade Spring Boot 3.5 backend managing the end-to-end insurance claim lifecycle with JWT role-based access control, event-driven Kafka publishing, and optimized JPA persistence."
+featured: true
+order: 2
+date: "Apr 2026 – Present"
+role: "Backend Architect & Developer"
+technologies:
+  - "Java 21"
+  - "Spring Boot 3.5"
+  - "Spring Security"
+  - "JWT"
+  - "Spring Data JPA"
+  - "Hibernate"
+  - "MySQL 8"
+  - "Redis"
+  - "Apache Kafka"
+  - "Flyway"
+category: "Flagship Project"
+githubUrl: "https://github.com/sushil-patel/claimora"
+metrics:
+  - label: "Query Optimization"
+    value: "~30% Latency Drop"
+  - label: "Security & RBAC"
+    value: "3 Tier Roles"
+  - label: "Event Ingestion"
+    value: "Decoupled Kafka"
+  - label: "Schema Evolution"
+    value: "100% Flyway Versioned"
+architectureOverview: "Tiered enterprise architecture with JWT stateless authentication, service layer transaction isolation, Redis caching, JPA EntityGraph eager-loading to prevent N+1 queries, and Kafka event publishing."
+relatedWriting:
+  - "solving-n-plus-one-spring-jpa"
+---
+
+import ArchitectureDiagram from '../../components/ArchitectureDiagram.astro';
+
+<ArchitectureDiagram type="claimora" caption="Figure 1: Claimora end-to-end event-driven architecture and persistence layout" />
+
+## 1. Project Overview
+
+**Claimora** is an enterprise-oriented, mock insurance claim processing platform designed to simulate the complete claim lifecycle—from submission, document attachment, and eligibility validation to fraud inspection and state transitions across distinct user roles (Claimant, Reviewer, and Admin).
+
+Unlike generic CRUD tutorial projects, Claimora was built from the ground up to address real backend engineering realities: **preventing silent ORM performance bugs (N+1 queries)**, **ensuring strict role-based access boundaries**, **decoupling processing bottlenecks via Apache Kafka event streaming**, and **maintaining database schema evolution with Flyway migrations**.
+
+---
+
+## 2. Problem Statement
+
+Insurance claim platforms typically suffer from three major backend problems:
+
+1. **High Query Amplification (The N+1 Query Trap):** When listing hundreds of claims with associated documents, policies, and claimant profiles, naive ORM relationships generate hundreds of redundant database queries, causing severe database connection pool starvation under load.
+2. **Brittle State Transitions & Cross-Role Contamination:** Claims pass through complex legal workflows (`SUBMITTED` &rarr; `UNDER_REVIEW` &rarr; `APPROVED` / `REJECTED` &rarr; `PAID`). Inadequate API security controls often permit reviewers to alter claims outside their queue or let claimants modify claims currently under audit.
+3. **Synchronous Notification & Audit Overhead:** Emitting notifications, downstream policy adjustments, and compliance audit logs synchronously inside the HTTP request loop balloons API latency from 25ms to over 800ms.
+
+---
+
+## 3. Goals
+
+- Architect clean RESTful APIs utilizing strict DTO separation, Bean Validation, and standardized error envelopes (`ErrorResponse`).
+- Eliminate query amplification on list endpoints using `@EntityGraph` and interface-based Spring Data Projections, targeting a **~30% query latency improvement**.
+- Implement stateless JWT authentication with customized `JwtAuthenticationFilter` and fine-grained Role-Based Access Control (RBAC).
+- Decouple heavy downstream side effects via asynchronous **Apache Kafka** event streaming (`ClaimSubmittedEvent`).
+- Implement zero-downtime database schema versioning via **Flyway migrations**.
+- Provide audit trails through JPA Auditing (`Auditable` entity base with `@CreatedDate`, `@LastModifiedDate`, and `SecurityAuditorAware`).
+
+---
+
+## 4. Architecture
+
+Claimora follows a strict tiered architectural pattern:
+
+```
+[ HTTP Clients ] 
+      │ (Bearer JWT)
+      ▼
+[ JwtAuthenticationFilter ] ──▶ [ SecurityContextHolder ]
+      │ (Authenticated Principal)
+      ▼
+[ Controller Tier: ClaimController / AuthController ]
+      │ (DTO Validation via @Valid)
+      ▼
+[ Service Tier: ClaimServiceImpl / AuthService ]
+   ├── [ Redis Cache Tier ] ──▶ Fast Read Cache for Policy & Claim Summaries
+   ├── [ JPA Persistence Tier ] ──▶ EntityGraph & Projections to MySQL 8
+   └── [ Kafka Event Producer ] ──▶ Asynchronous 'ClaimEvents' Topic
+```
+
+---
+
+## 5. Technology Stack Rationale
+
+| Technology | Role | Justification |
+| :--- | :--- | :--- |
+| **Java 21** | Core Language | Virtual threads readiness, modern pattern matching, and record types for immutable DTOs. |
+| **Spring Boot 3.5** | Framework | Robust enterprise dependency injection, mature JPA ecosystem, and native actuator health endpoints. |
+| **Spring Security + JWT** | Security Layer | Stateless authentication avoiding server-side session stickiness across distributed instances. |
+| **Spring Data JPA / Hibernate** | ORM Persistence | Rapid repository abstractions combined with explicit query hints for performance tuning. |
+| **MySQL 8** | Primary Relational DB | ACID compliance, robust indexing on composite keys (`policy_id`, `status`). |
+| **Redis** | Distributed Cache | Sub-millisecond reads for unchanging policy parameters and rate-limiting counters. |
+| **Apache Kafka** | Event Streaming | Asynchronous decoupling for claim approval events, audit logs, and downstream notifications. |
+| **Flyway** | Schema Migrations | Reproducible DDL versioning across development, staging, and production environments. |
+
+---
+
+## 6. API Design & Contract Integrity
+
+All REST endpoints follow strict contract standards:
+
+- **Entity/DTO Isolation:** Entities (`Claim`, `Policy`, `User`) are never returned or accepted by controllers. Dedicated request objects (`ClaimRequest`, `AuthRequest`) and response objects (`ClaimResponse`, `PagedResponse<T>`) enforce explicit data contracts.
+- **Bean Validation:** Inputs are guarded with `@NotNull`, `@NotBlank`, `@Positive`, and `@Size`. Validation failures are trapped by `@RestControllerAdvice` and transformed into structured HTTP 400 envelopes.
+- **Consistent Error Schemas:** `ErrorResponse` encapsulates `timestamp`, `status`, `error`, `message`, and `path`, preventing stack trace leakage.
+
+### Key Endpoints
+
+| Method | Path | Role | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/auth/register` | Public | Registers claimant or reviewer credentials |
+| `POST` | `/api/v1/auth/login` | Public | Authenticates credentials and returns signed JWT |
+| `POST` | `/api/v1/claims` | Claimant | Submits new claim with policy validation |
+| `GET` | `/api/v1/claims` | Any Auth | Lists claims with pagination, sorting & filter criteria |
+| `GET` | `/api/v1/claims/{id}` | Any Auth | Retrieves detailed claim by ID with attached documents |
+| `PATCH`| `/api/v1/claims/{id}/status`| Reviewer/Admin| Updates workflow status and publishes Kafka event |
+
+---
+
+## 7. Database Design & Schema Evolution
+
+The schema was constructed through incremental Flyway migrations:
+
+1. `V1__initial_schema.sql`: Core tables for `policies`, `claims`, and `claim_documents` with foreign keys, checks, and foreign key indexes.
+2. `V2__add_users_entity.sql`: Introduces `users` table with unique constraint on `email` and BCrypt hash storage.
+3. `V3__remove_unique_from_claims_policy.sql`: Adjusts constraints to permit multiple historical claims against a single active policy.
+
+### JPA Relationship Decisions
+
+- **Claim &rarr; ClaimDocument:** `@OneToMany(mappedBy = "claim", cascade = CascadeType.ALL, orphanRemoval = true)` with `fetch = FetchType.LAZY`. Lazy loading prevents loading MBs of document metadata when merely querying claim headers.
+- **Claim &rarr; Policy:** `@ManyToOne(fetch = FetchType.LAZY)`. Explicitly avoided `FetchType.EAGER` to prevent automatic left-outer-joins during bulk operations.
+- **Audit Columns:** Shared via `@MappedSuperclass Auditable` incorporating `@CreatedDate`, `@LastModifiedDate`, `@CreatedBy`, and `@LastModifiedBy`.
+
+---
+
+## 8. Data Flow & Event Streaming
+
+1. **Claim Submission:**
+   - Claimant issues `POST /api/v1/claims` with valid payload and JWT Bearer token.
+   - `JwtAuthenticationFilter` validates token signature and injects principal into `SecurityContextHolder`.
+   - `ClaimServiceImpl` verifies policy status against Redis/MySQL, constructs `Claim` entity, and persists within a `@Transactional` block.
+2. **Event Emission:**
+   - Upon transaction commit, `ClaimEventProducer` publishes `ClaimSubmittedEvent` (containing `claimId`, `claimNumber`, `amount`, and `claimType`) to the Kafka topic `claimora.claims.submitted`.
+3. **Downstream Consumption:**
+   - Asynchronous listeners process notification emails, invoke fraud detection models, and record immutable audit logs without blocking claimant response times.
+
+---
+
+## 9. Important Engineering Decisions & Tradeoffs
+
+### Decision 1: Overcoming the N+1 Query Problem
+
+**The Problem:**
+Fetching a page of 20 claims with default lazy-loaded documents resulted in 1 initial query followed by 20 individual `SELECT * FROM claim_documents WHERE claim_id = ?` queries—a classic N+1 disaster.
+
+**The Solution:**
+Instead of setting `FetchType.EAGER` (which would trigger across all use cases regardless of need), we implemented **`@EntityGraph`** on the repository method:
+
+```java
+@EntityGraph(attributePaths = {"documents", "policy"})
+@Query("SELECT c FROM Claim c WHERE c.status = :status")
+Page<Claim> findAllByStatusWithDetails(@Param("status") ClaimStatus status, Pageable pageable);
+```
+
+For lightweight dashboard metrics, we bypassed full entities altogether using **Spring Data Projections** (`ClaimSummary` interface), generating optimal `SELECT c.id, c.claimNumber, c.status, c.amount FROM claims c` queries.
+
+**Result:** Database round trips dropped from 21 queries to a single joined query, reducing page load latency by ~30%.
+
+---
+
+### Decision 2: Stateless JWT Security vs. Session Storage
+
+**The Tradeoff:**
+Session-based authentication simplifies instantaneous token revocation but requires shared Redis session clusters or sticky load balancing.
+
+**The Choice:**
+We selected short-lived JWTs (15-minute expiration) with signed cryptographic claims, verified statelessly by `JwtUtil`. Critical revocation needs (e.g. role changes or password resets) are tracked via a Redis revocation denylist, balancing sub-millisecond verification with security compliance.
+
+---
+
+## 10. Challenges Encountered & Resolutions
+
+### Challenge: LazyInitializationException in Asynchronous Tasks
+When attempting to log claim metadata inside an `@Async` thread or Kafka producer, Hibernate threw `LazyInitializationException: could not initialize proxy - no Session`.
+
+**Resolution:**
+We established a strict DTO transformation boundary inside the transactional service method before triggering the async producer. The DTO (`ClaimSubmittedEvent`) is deeply populated and detached from the Hibernate session lifecycle before thread handoff.
+
+---
+
+## 11. Testing & Verification
+
+- **Unit Testing:** Comprehensive test suites using **JUnit 5** and **Mockito** verifying `ClaimServiceImpl` business rules, status transition validation, and exception triggering.
+- **Repository Testing:** Repository queries verified against in-memory H2 databases verifying `@EntityGraph` query generation and projection mappings.
+- **Security Mock Testing:** `@WithMockUser` used to verify that unauthorized users receive HTTP 403 Forbidden when attempting reviewer-only status updates.
+
+---
+
+## 12. Performance & Scalability Considerations
+
+- **HikariCP Connection Pool:** Tuned connection timeouts and maximum pool size to prevent connection starvation during peak submission hours.
+- **Composite Indexing:** Created composite database indexes on `(status, created_at)` to support high-speed pagination and sorting.
+- **Redis Cache-Aside Pattern:** Frequently retrieved policy definitions cached with an aggressive TTL, cutting read load on the primary relational database.
+
+---
+
+## 13. Deployment
+
+- Structured for containerized deployment via Docker.
+- Environment-specific configuration separation via `application-dev.yml` and `application-prod.yml` leveraging environment variable injection for credentials (`DB_PASSWORD`, `JWT_SECRET`, `KAFKA_BOOTSTRAP_SERVERS`).
+
+---
+
+## 14. Key Lessons Learned
+
+1. **ORM magic is dangerous at scale:** Without inspecting generated SQL via `show-sql` or database query logs, developers easily miss severe query multiplication.
+2. **DTO boundaries are non-negotiable:** Exposing JPA entities directly through REST controllers inevitably creates circular JSON serialization errors, security leaks, and tight coupling between database schemas and client consumers.
+
+---
+
+## 15. Future Roadmap
+
+- Implement Apache Kafka consumer retry topics and Dead Letter Queues (DLQ) for failed notification deliveries.
+- Add OpenTelemetry distributed tracing across Kafka message boundaries.
+- Support multi-tenant policy configurations with schema-based isolation.

@@ -1,0 +1,155 @@
+---
+title: "Processing 800,000 Records Under 20 Minutes: File Splitting, Task Partitioning, and Message Queues"
+description: "How we optimized a monolithic enterprise batch workflow at TCS, using Java NIO file-splitting, IBM MQ distributed queues, and Redis caching to slash execution time by 50%."
+publishedDate: "2026-03-20"
+readingTime: "9 min read"
+tags:
+  - "Java"
+  - "Spring Batch"
+  - "IBM MQ"
+  - "Distributed Systems"
+  - "Redis"
+  - "Performance"
+draft: false
+---
+
+Enterprise backend engineering often lives or dies by batch processing windows. When financial transaction files arriving via automated SFTP exceed hundreds of thousands of records, sequential single-threaded execution quickly breaches service-level agreements (SLAs).
+
+At **Tata Consultancy Services (TCS)**, our module was tasked with optimizing an inbound batch pipeline processing **800,000+ records**. The existing job ran for over 45 minutes during month-end spikes, frequently exhausting database connection pools and colliding with daytime online transactional workloads.
+
+Here is the architectural pattern we designed to achieve an ingestion rate of **800,000+ records in under 20 minutes (over 50% runtime cut)**.
+
+---
+
+## 1. The Monolithic Bottleneck
+
+The legacy implementation operated sequentially:
+
+1. Download the complete 800K record file via SFTP.
+2. Read line-by-line using `BufferedReader`.
+3. For each line, validate data format, verify user state against the database, and issue an SQL `INSERT`.
+4. Commit every 1,000 lines.
+
+### Why This Failed Under High Load:
+
+- **Single Core Saturation:** The entire file was held by a single Java thread; on a 32-core production VM, 31 cores sat idle.
+- **Round-Trip Latency Accumulation:** Validating each user against the database sequentially incurred network latency 800,000 times. Even at 1 millisecond per check, validation alone devoured over 13 minutes.
+- **Transaction Rollback Blast Radius:** An unexpected error at record 799,000 caused lengthy recovery and checkpoint replays.
+
+---
+
+## 2. Architectural Blueprint: Slicing, Queuing, and Caching
+
+To scale throughput, we decomposed the monolithic job into three decoupled phases:
+
+```
+[ Inbound SFTP File ]
+        │
+        ▼ (Phase 1: Zero-Copy Slicing)
+[ 80 x 10,000-Record Partition Chunks ]
+        │
+        ▼ (Phase 2: Queue Publication)
+[ IBM MQ Ingestion Topic / Queues ]
+        │
+        ├─────────────┬─────────────┐
+        ▼             ▼             ▼
+  [ Worker 1 ]   [ Worker 2 ]  [ Worker 3... ] (Concurrent Consumers)
+        │
+        ├──▶ Check Hot Reference Data in Redis (< 0.2ms)
+        └──▶ JDBC Batch Insert (1,000 rows per batch commit)
+```
+
+---
+
+## 3. Phase 1: High-Speed File Splitting (Java NIO.2)
+
+Instead of passing the massive file directly into memory, we created a streaming file partitioner using Java NIO.2.
+
+The partitioner scans line boundaries with an 8KB byte buffer, emitting separate chunk files containing exactly 10,000 records each:
+
+```java
+public List<Path> partitionFile(Path sourceFile, int linesPerChunk) throws IOException {
+    List<Path> chunkPaths = new ArrayList<>();
+    try (BufferedReader reader = Files.newBufferedReader(sourceFile, StandardCharsets.UTF_8)) {
+        String line;
+        int currentLineCount = 0;
+        int chunkIndex = 1;
+        BufferedWriter writer = null;
+
+        while ((line = reader.readLine()) != null) {
+            if (currentLineCount % linesPerChunk == 0) {
+                if (writer != null) writer.close();
+                Path chunk = createChunkPath(sourceFile, chunkIndex++);
+                chunkPaths.add(chunk);
+                writer = Files.newBufferedWriter(chunk, StandardCharsets.UTF_8);
+            }
+            writer.write(line);
+            writer.newLine();
+            currentLineCount++;
+        }
+        if (writer != null) writer.close();
+    }
+    return chunkPaths;
+}
+```
+
+Splitting an 800,000-line file into 80 discrete chunks completes in **less than 6 seconds**.
+
+---
+
+## 4. Phase 2: Decoupled Queue Distribution via IBM MQ
+
+Each generated chunk descriptor (or serialized chunk payload) is dispatched as a persistent message to **IBM MQ**.
+
+Using message queues provides three critical guarantees:
+
+1. **At-Least-Once Delivery:** Network drops or worker failures do not drop records. Unacknowledged chunks are automatically requeued.
+2. **Worker Elasticity:** If inbound volume surges, additional worker nodes spin up and consume partitions without coordinating state with other workers.
+3. **Dead-Letter Queue (DLQ) Isolation:** Corrupted chunks are segregated to a DLQ for operational review without blocking subsequent valid chunks.
+
+---
+
+## 5. Phase 3: Redis Cache-Aside & Batch JDBC Inserts
+
+Inside each worker thread:
+
+### 1. Redis Caching for Hot Master Data
+Instead of issuing 10,000 `SELECT` queries to verify customer accounts, workers query a localized **Redis cluster** containing pre-warmed account eligibility hashes:
+
+```java
+Boolean isEligible = redisTemplate.opsForSet().isMember("active_accounts", accountId);
+if (Boolean.TRUE.equals(isEligible)) {
+    // Fast pass: No SQL query required
+}
+```
+
+This single change reduced database read IOPS by over **70%**.
+
+### 2. Native JDBC Batch PreparedStatement
+Workers buffer 1,000 valid records and flush them via JDBC `executeBatch()`:
+
+```java
+try (PreparedStatement ps = connection.prepareStatement(INSERT_SQL)) {
+    for (Record record : batch) {
+        ps.setString(1, record.getId());
+        ps.setBigDecimal(2, record.getAmount());
+        ps.setTimestamp(3, Timestamp.from(record.getTimestamp()));
+        ps.addBatch();
+    }
+    ps.executeBatch();
+    connection.commit();
+}
+```
+
+---
+
+## 6. Results and Operational Metrics
+
+| Metric | Monolithic Baseline | Partitioned + MQ Pipeline | Improvement |
+| :--- | :--- | :--- | :--- |
+| **Total Ingestion Time** | 45+ minutes | **18.5 minutes** | **58% faster** |
+| **Throughput** | ~290 records/sec | **~720 records/sec** | **2.5x increase** |
+| **Database Lock Wait Time** | High (Contention) | Near Zero (Batch inserts) | **~90% reduction** |
+| **Peak Server CPU** | 92% (Single node) | 48% (Evenly distributed) | **30% reduction** |
+
+By understanding concurrency, I/O streaming boundaries, and message-driven architectures, we converted an unstable operational bottleneck into a predictable, robust enterprise service.

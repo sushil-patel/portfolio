@@ -1,0 +1,354 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ExperienceCard from '../components/ExperienceCard.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import MetricCard from '../components/MetricCard.astro';
+import Badge from '../components/Badge.astro';
+import { siteConfig } from '../config/site';
+import { getRelativePath } from '../utils/url';
+import { getCollection } from 'astro:content';
+
+const allProjects = await getCollection('projects');
+const featuredProjects = allProjects
+  .filter((p) => p.data.featured)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const allArticles = await getCollection('writing');
+const featuredArticles = allArticles
+  .filter((a) => !a.data.draft)
+  .sort((a, b) => new Date(b.data.publishedDate).getTime() - new Date(a.data.publishedDate).getTime())
+  .slice(0, 3);
+---
+
+<BaseLayout
+  seo={{
+    title: `${siteConfig.name} | Software Developer & Module Lead`,
+    description: siteConfig.headline,
+  }}
+>
+  <!-- 1. HERO SECTION -->
+  <section class="py-6 sm:py-10 border-b border-slate-100 dark:border-slate-800">
+    <div class="max-w-4xl">
+      <!-- Status Badge -->
+      <div class="inline-flex items-center gap-2 rounded-full border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/70 dark:bg-indigo-950/40 px-3 py-1 text-xs font-medium text-indigo-800 dark:text-indigo-300 mb-6">
+        <span class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
+        <span>Open to Software Engineering &amp; Development Opportunities</span>
+      </div>
+
+      <h1 class="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white sm:text-5xl lg:text-6xl">
+        Hi, I'm <span class="text-slate-900 dark:text-slate-100">{siteConfig.name}</span>.
+      </h1>
+
+      <p class="mt-4 text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-300 tracking-tight">
+        Software Developer &amp; Module Lead
+      </p>
+
+      <p class="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
+        Building high-performance backend architectures, robust distributed systems, and developer automation tooling using <span class="text-slate-900 dark:text-slate-100 font-semibold">Java, Spring Boot, Apache Kafka, IBM MQ, Redis,</span> and <span class="text-slate-900 dark:text-slate-100 font-semibold">SQL</span>.
+      </p>
+
+      <!-- Recruiter CTAs -->
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a
+          href={getRelativePath('/projects')}
+          class="inline-flex items-center justify-center rounded-lg bg-slate-900 dark:bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
+        >
+          <span>Explore Projects</span>
+          <svg class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+
+        <a
+          href={getRelativePath(siteConfig.resumePath)}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-2.5 text-sm font-semibold text-slate-800 dark:text-slate-200 shadow-xs transition hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <svg class="mr-2 h-4 w-4 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>Download Resume (PDF)</span>
+        </a>
+
+        <div class="flex items-center gap-2 pl-2">
+          <a
+            href={siteConfig.social.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+            aria-label="GitHub Profile"
+          >
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+            </svg>
+          </a>
+          <a
+            href={siteConfig.social.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+            aria-label="LinkedIn Profile"
+          >
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+            </svg>
+          </a>
+          <a
+            href={`mailto:${siteConfig.email}`}
+            class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+            aria-label="Direct Email"
+          >
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verified Impact Metrics Grid -->
+    <div class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <MetricCard
+        value="800K+"
+        label="Batch Throughput"
+        detail="Records processed in < 20 min via IBM MQ"
+      />
+      <MetricCard
+        value="50%"
+        label="Batch Window Cut"
+        detail="Task partitioning & Redis caching"
+      />
+      <MetricCard
+        value="30%"
+        label="Query Latency Drop"
+        detail="JPA EntityGraph & Projections optimization"
+      />
+      <MetricCard
+        value="3 Years"
+        label="Enterprise Track Record"
+        detail="Module Lead at TCS · AWS Certified"
+      />
+    </div>
+  </section>
+
+  <!-- 2. FEATURED PROJECTS -->
+  <section class="py-12 border-b border-slate-100 dark:border-slate-800">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-2">
+      <div>
+        <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-indigo-700 dark:text-indigo-400 font-semibold">
+          <span>Featured Work</span>
+        </div>
+        <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+          Featured Projects
+        </h2>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          Independent and collaborative software applications built with modern engineering stacks.
+        </p>
+      </div>
+
+      <a
+        href={getRelativePath('/projects')}
+        class="inline-flex items-center gap-1 text-sm font-semibold text-slate-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+      >
+        <span>View all {allProjects.length} projects</span>
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      {featuredProjects.map((project) => (
+        <ProjectCard
+          title={project.data.title}
+          slug={project.slug}
+          description={project.data.description}
+          category={project.data.category}
+          date={project.data.date}
+          technologies={project.data.technologies}
+          githubUrl={project.data.githubUrl}
+          liveUrl={project.data.liveUrl}
+          metrics={project.data.metrics}
+          featured={project.data.featured}
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- 3. PROFESSIONAL EXPERIENCE AT A GLANCE -->
+  <section class="py-12 border-b border-slate-100 dark:border-slate-800">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-2">
+      <div>
+        <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-indigo-700 dark:text-indigo-400 font-semibold">
+          <span>Career Track</span>
+        </div>
+        <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+          Professional Experience
+        </h2>
+      </div>
+
+      <a
+        href={getRelativePath('/experience')}
+        class="inline-flex items-center gap-1 text-sm font-semibold text-slate-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+      >
+        <span>Detailed Work History</span>
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+
+    <div class="space-y-8">
+      <ExperienceCard
+        role="Software Developer — Java Developer — Module Lead"
+        company="Tata Consultancy Services (TCS) Limited"
+        period="Oct 2023 – Present"
+        location="India"
+        leadership="Leading a module of 4 engineers, driving application design, code reviews, mentoring, and cross-functional delivery with QA and client teams."
+        highlights={[
+          "Reduced batch processing time by 50% by optimizing Java batch workflows through parallel execution, Redis-based caching, and efficient task partitioning for high-volume workloads.",
+          "Contributed to the design and development of high-throughput, event-driven backend services processing 800K+ records in under 20 minutes using file-splitting techniques and IBM MQ, with fault handling and performance optimization.",
+          "Engineered an automated deployment verification tool that reduced staging-to-production archive comparison time from 2.5 hours to under 3 minutes, adopted by the project module and recognized with a Special Initiative Award.",
+          "Contributed to Redis-based rate limiting and JWT authentication using Spring Boot, helping reduce peak-period server load by 30% and strengthen access control.",
+          "Contributed to automated inbound file processing using scheduled Spring Boot jobs and SFTP, with validation, retry mechanisms, and alerting to reduce manual intervention.",
+          "Supported migration of legacy MD5 password storage to BCrypt, including backward-compatible password rehashing to strengthen credential security.",
+          "Troubleshot production issues through log analysis and root-cause investigation, implementing preventive fixes that improved application reliability and operational stability by roughly 25%."
+        ]}
+        skills={["Java", "Spring Boot", "IBM MQ", "Redis", "Oracle SQL", "Kafka", "SonarQube", "SOLID", "JUnit", "Mockito"]}
+      />
+    </div>
+  </section>
+
+  <!-- 4. CATEGORIZED TECH STACK -->
+  <section class="py-12 border-b border-slate-100 dark:border-slate-800">
+    <div class="mb-8">
+      <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-indigo-700 dark:text-indigo-400 font-semibold">
+        <span>Technical Competencies</span>
+      </div>
+      <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+        Categorized Technical Stack
+      </h2>
+      <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+        Technologies applied across web applications, enterprise systems, and developer tooling.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {siteConfig.skillCategories.map((group) => (
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+          <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+            {group.category}
+          </h3>
+          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            {group.description}
+          </p>
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            {group.skills.map((skill) => (
+              <span
+                class="inline-flex items-center gap-1 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                title={skill.note}
+              >
+                <span>{skill.name}</span>
+                {skill.level === 'Core' && (
+                  <span class="h-1.5 w-1.5 rounded-full bg-indigo-500" title="Core Production Skill"></span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- 5. TECHNICAL WRITING -->
+  <section class="py-12 border-b border-slate-100 dark:border-slate-800">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-2">
+      <div>
+        <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-indigo-700 dark:text-indigo-400 font-semibold">
+          <span>Engineering Notes</span>
+        </div>
+        <h2 class="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+          Technical Writing &amp; Deep Dives
+        </h2>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          Articles on software architecture, query optimization, and distributed systems design.
+        </p>
+      </div>
+
+      <a
+        href={getRelativePath('/writing')}
+        class="inline-flex items-center gap-1 text-sm font-semibold text-slate-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+      >
+        <span>View all articles</span>
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {featuredArticles.map((article) => (
+        <ArticleCard
+          title={article.data.title}
+          slug={article.slug}
+          description={article.data.description}
+          publishedDate={article.data.publishedDate}
+          tags={article.data.tags}
+          readingTime={article.data.readingTime}
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- 6. CONTACT CTA -->
+  <section class="py-12">
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/60 p-8 sm:p-12 text-center max-w-3xl mx-auto">
+      <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 mb-4">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      </div>
+
+      <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+        Looking for a versatile Software Developer?
+      </h2>
+
+      <p class="mt-3 text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl mx-auto">
+        I'm actively interviewing for software engineering and development roles. Feel free to reach out directly via email or connect on LinkedIn.
+      </p>
+
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <a
+          href={`mailto:${siteConfig.email}`}
+          class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-700 transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <span>Send an Email</span>
+        </a>
+
+        <a
+          href={siteConfig.social.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-2.5 text-sm font-semibold text-slate-800 dark:text-slate-200 shadow-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+        >
+          <svg class="h-4 w-4 text-slate-600 dark:text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+          </svg>
+          <span>Connect on LinkedIn</span>
+        </a>
+
+        <a
+          href={getRelativePath('/contact')}
+          class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+        >
+          <span>Contact Details</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

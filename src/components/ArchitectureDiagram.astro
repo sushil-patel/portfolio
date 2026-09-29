@@ -1,0 +1,182 @@
+---
+export interface Props {
+  type: 'claimora' | 'artifact-tool' | 'batch-engine';
+  caption?: string;
+}
+
+const { type, caption } = Astro.props;
+---
+
+<figure class="my-8 overflow-hidden rounded-xl border border-slate-200 bg-slate-900 text-slate-100 p-4 sm:p-6 shadow-sm">
+  <div class="mb-4 flex items-center justify-between border-b border-slate-800 pb-3 text-xs">
+    <div class="flex items-center gap-2 font-mono text-indigo-400">
+      <span class="inline-block h-2 w-2 rounded-full bg-indigo-400 animate-pulse"></span>
+      <span>SYSTEM ARCHITECTURE TOPOLOGY</span>
+    </div>
+    <span class="font-mono text-[11px] text-slate-400">Vector SVG · Low Overhead</span>
+  </div>
+
+  <div class="w-full overflow-x-auto py-2">
+    {type === 'claimora' && (
+      <svg
+        viewBox="0 0 860 300"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        class="min-w-[700px] w-full h-auto text-xs font-mono"
+        aria-label="Claimora event-driven claims platform architecture diagram"
+      >
+        <!-- Client / Consumers -->
+        <rect x="20" y="50" width="130" height="70" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+        <text x="85" y="80" text-anchor="middle" fill="#f8fafc" font-weight="bold">Client App</text>
+        <text x="85" y="100" text-anchor="middle" fill="#94a3b8" font-size="11">JWT Bearer Token</text>
+
+        <!-- Arrow to API Gateway / Security Filter -->
+        <path d="M150 85 H210" stroke="#10b981" stroke-width="2" marker-end="url(#arrow)" />
+
+        <!-- Spring Security Filter -->
+        <rect x="210" y="50" width="150" height="70" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5" />
+        <text x="285" y="80" text-anchor="middle" fill="#f8fafc" font-weight="bold">JwtAuthFilter</text>
+        <text x="285" y="100" text-anchor="middle" fill="#34d399" font-size="11">RBAC / Claim Roles</text>
+
+        <!-- Arrow to Spring Boot Service -->
+        <path d="M360 85 H420" stroke="#10b981" stroke-width="2" />
+
+        <!-- Core Service & Data Layer -->
+        <rect x="420" y="30" width="180" height="110" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5" />
+        <text x="510" y="60" text-anchor="middle" fill="#f8fafc" font-weight="bold">Spring Boot 3.5.x</text>
+        <text x="510" y="80" text-anchor="middle" fill="#93c5fd" font-size="11">ClaimService &amp; DTOs</text>
+        <text x="510" y="100" text-anchor="middle" fill="#94a3b8" font-size="11">EntityGraph &amp; Projections</text>
+        <text x="510" y="120" text-anchor="middle" fill="#94a3b8" font-size="11">JPA Auditing / Soft Delete</text>
+
+        <!-- Arrow from Service to Redis & MySQL -->
+        <path d="M510 140 V190" stroke="#60a5fa" stroke-width="2" />
+        
+        <!-- Persistence Box -->
+        <rect x="420" y="190" width="85" height="75" rx="6" fill="#0f172a" stroke="#ef4444" stroke-width="1.5" />
+        <text x="462" y="222" text-anchor="middle" fill="#fca5a5" font-weight="bold">Redis</text>
+        <text x="462" y="242" text-anchor="middle" fill="#94a3b8" font-size="10">Cache Tier</text>
+
+        <rect x="515" y="190" width="85" height="75" rx="6" fill="#0f172a" stroke="#eab308" stroke-width="1.5" />
+        <text x="557" y="222" text-anchor="middle" fill="#fde047" font-weight="bold">MySQL 8</text>
+        <text x="557" y="242" text-anchor="middle" fill="#94a3b8" font-size="10">Flyway Migr.</text>
+
+        <!-- Arrow from Service to Kafka -->
+        <path d="M600 85 H660" stroke="#f59e0b" stroke-width="2" />
+
+        <!-- Kafka Cluster -->
+        <rect x="660" y="30" width="170" height="110" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5" />
+        <text x="745" y="60" text-anchor="middle" fill="#fbbf24" font-weight="bold">Apache Kafka</text>
+        <text x="745" y="80" text-anchor="middle" fill="#f8fafc" font-size="11">ClaimEvents Topic</text>
+        <text x="745" y="100" text-anchor="middle" fill="#94a3b8" font-size="11">Event-Driven Lifecycle</text>
+        <text x="745" y="120" text-anchor="middle" fill="#34d399" font-size="10">Async Notification &amp; Audit</text>
+
+        <!-- Defs for arrow markers -->
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981" />
+          </marker>
+        </defs>
+      </svg>
+    )}
+
+    {type === 'artifact-tool' && (
+      <svg
+        viewBox="0 0 860 260"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        class="min-w-[700px] w-full h-auto text-xs font-mono"
+        aria-label="Artifact Comparison tool architecture diagram"
+      >
+        <!-- Staging & Prod Dirs -->
+        <rect x="20" y="40" width="150" height="60" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+        <text x="95" y="68" text-anchor="middle" fill="#f8fafc" font-weight="bold">Staging Artifacts</text>
+        <text x="95" y="86" text-anchor="middle" fill="#94a3b8" font-size="11">Directory Tree A</text>
+
+        <rect x="20" y="130" width="150" height="60" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+        <text x="95" y="158" text-anchor="middle" fill="#f8fafc" font-weight="bold">Production Artifacts</text>
+        <text x="95" y="176" text-anchor="middle" fill="#94a3b8" font-size="11">Directory Tree B</text>
+
+        <!-- Arrows to Walker -->
+        <path d="M170 70 H220" stroke="#10b981" stroke-width="2" />
+        <path d="M170 160 H220" stroke="#10b981" stroke-width="2" />
+
+        <!-- Multithreaded Crawler -->
+        <rect x="220" y="60" width="180" height="110" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5" />
+        <text x="310" y="90" text-anchor="middle" fill="#34d399" font-weight="bold">Parallel File Walker</text>
+        <text x="310" y="112" text-anchor="middle" fill="#f8fafc" font-size="11">Recursive NIO Path Traversal</text>
+        <text x="310" y="132" text-anchor="middle" fill="#94a3b8" font-size="10">ForkJoinPool / Virtual Threads</text>
+        <text x="310" y="150" text-anchor="middle" fill="#cbd5e1" font-size="10">Task Partitioning</text>
+
+        <!-- Arrow to Hashing Engine -->
+        <path d="M400 115 H450" stroke="#10b981" stroke-width="2" />
+
+        <!-- SHA-256 Digest Engine -->
+        <rect x="450" y="60" width="170" height="110" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5" />
+        <text x="535" y="90" text-anchor="middle" fill="#93c5fd" font-weight="bold">SHA-256 Digest Pool</text>
+        <text x="535" y="112" text-anchor="middle" fill="#f8fafc" font-size="11">MessageDigest Buffers</text>
+        <text x="535" y="132" text-anchor="middle" fill="#94a3b8" font-size="10">Stream-based zero-copy</text>
+        <text x="535" y="150" text-anchor="middle" fill="#10b981" font-size="10">240x Speedup (30s vs 2h)</text>
+
+        <!-- Arrow to Comparison Matrix & Report -->
+        <path d="M620 115 H670" stroke="#3b82f6" stroke-width="2" />
+
+        <!-- Report Generation -->
+        <rect x="670" y="45" width="165" height="140" rx="8" fill="#1e293b" stroke="#eab308" stroke-width="1.5" />
+        <text x="752" y="75" text-anchor="middle" fill="#fde047" font-weight="bold">Diff &amp; Validation</text>
+        <text x="752" y="98" text-anchor="middle" fill="#f8fafc" font-size="11">GitLab Branch Correlation</text>
+        <text x="752" y="118" text-anchor="middle" fill="#94a3b8" font-size="10">Unmatched / Altered Files</text>
+        <text x="752" y="138" text-anchor="middle" fill="#94a3b8" font-size="10">Consolidated Audit HTML/CSV</text>
+        <text x="752" y="162" text-anchor="middle" fill="#34d399" font-size="10">Enterprise Standardized</text>
+      </svg>
+    )}
+
+    {type === 'batch-engine' && (
+      <svg
+        viewBox="0 0 860 260"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        class="min-w-[700px] w-full h-auto text-xs font-mono"
+        aria-label="High-throughput batch and event-driven pipeline architecture diagram"
+      >
+        <!-- Inbound SFTP -->
+        <rect x="20" y="70" width="140" height="85" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+        <text x="90" y="98" text-anchor="middle" fill="#f8fafc" font-weight="bold">Inbound SFTP</text>
+        <text x="90" y="118" text-anchor="middle" fill="#94a3b8" font-size="11">800K+ Record Files</text>
+        <text x="90" y="136" text-anchor="middle" fill="#34d399" font-size="10">Scheduled Trigger</text>
+
+        <path d="M160 112 H210" stroke="#10b981" stroke-width="2" />
+
+        <!-- File Splitting & Partitioning -->
+        <rect x="210" y="70" width="160" height="85" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5" />
+        <text x="290" y="98" text-anchor="middle" fill="#34d399" font-weight="bold">Chunk Partitioning</text>
+        <text x="290" y="118" text-anchor="middle" fill="#f8fafc" font-size="11">Parallel File Slicing</text>
+        <text x="290" y="136" text-anchor="middle" fill="#94a3b8" font-size="10">50% Runtime Cut</text>
+
+        <path d="M370 112 H420" stroke="#10b981" stroke-width="2" />
+
+        <!-- IBM MQ / Messaging -->
+        <rect x="420" y="60" width="170" height="105" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5" />
+        <text x="505" y="90" text-anchor="middle" fill="#fbbf24" font-weight="bold">IBM MQ Queues</text>
+        <text x="505" y="112" text-anchor="middle" fill="#f8fafc" font-size="11">Point-to-Point MDB</text>
+        <text x="505" y="132" text-anchor="middle" fill="#94a3b8" font-size="10">Fault Isolation &amp; DLQ</text>
+        <text x="505" y="150" text-anchor="middle" fill="#cbd5e1" font-size="10">&lt; 20 Min Batch Throughput</text>
+
+        <path d="M590 112 H640" stroke="#f59e0b" stroke-width="2" />
+
+        <!-- Consumer & Persistence -->
+        <rect x="640" y="50" width="190" height="125" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5" />
+        <text x="735" y="80" text-anchor="middle" fill="#93c5fd" font-weight="bold">Workers &amp; Storage</text>
+        <text x="735" y="102" text-anchor="middle" fill="#f8fafc" font-size="11">Redis Rate Limit &amp; Cache</text>
+        <text x="735" y="122" text-anchor="middle" fill="#94a3b8" font-size="10">BCrypt Re-hash Worker</text>
+        <text x="735" y="142" text-anchor="middle" fill="#94a3b8" font-size="10">Oracle / SQL Batch Insert</text>
+        <text x="735" y="160" text-anchor="middle" fill="#34d399" font-size="10">25% Ops Stability Boost</text>
+      </svg>
+    )}
+  </div>
+
+  {caption && (
+    <figcaption class="mt-3 text-center text-xs text-slate-400 font-mono">
+      {caption}
+    </figcaption>
+  )}
+</figure>

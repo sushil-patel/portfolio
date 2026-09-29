@@ -1,0 +1,43 @@
+---
+import { getRelativePath } from '../utils/url';
+
+export interface BreadcrumbItem {
+  name: string;
+  href?: string;
+}
+
+export interface Props {
+  items: BreadcrumbItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Breadcrumbs" class="mb-6 flex items-center text-xs font-medium text-slate-500 dark:text-slate-400">
+  <ol class="flex items-center space-x-2">
+    <li>
+      <a href={getRelativePath('/')} class="hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+        Home
+      </a>
+    </li>
+    {
+      items.map((item, index) => {
+        const isLast = index === items.length - 1;
+        return (
+          <li class="flex items-center space-x-2">
+            <span class="text-slate-300 dark:text-slate-600">/</span>
+            {isLast || !item.href ? (
+              <span class="text-slate-900 dark:text-slate-100 font-semibold truncate max-w-[200px] sm:max-w-md" aria-current="page">
+                {item.name}
+              </span>
+            ) : (
+              <a href={getRelativePath(item.href)} class="hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+                {item.name}
+              </a>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>

@@ -1,0 +1,180 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+
+const allProjects = await getCollection('projects');
+const sortedProjects = allProjects.sort((a, b) => a.data.order - b.data.order);
+
+// Extract distinct filter tags matching the curated showcase projects
+const filterOptions = [
+  'All',
+  'Java',
+  'Spring Boot',
+  'Kafka',
+  'MySQL',
+  'Python',
+  'DevOps & CI/CD',
+];
+---
+
+<BaseLayout
+  seo={{
+    title: 'Projects & Systems Engineering',
+    description: 'Explore distributed systems, backend architectures, and developer tooling created by Sushil Patel.',
+  }}
+>
+  <Breadcrumbs items={[{ name: 'Projects' }]} />
+
+  <!-- Page Header -->
+  <div class="max-w-3xl mb-8">
+    <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-indigo-700 dark:text-indigo-400 font-semibold">
+      <span>Software Portfolio</span>
+    </div>
+    <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white sm:text-4xl">
+      Projects &amp; Case Studies
+    </h1>
+    <p class="mt-3 text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+      A curated library of distributed services, backend architectures, and developer automation tooling. Each project highlights engineering decisions, algorithmic optimizations, and technical problem solving.
+    </p>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="mb-8 border-y border-slate-200/80 dark:border-slate-800 py-4" id="project-filters">
+    <div class="flex items-center justify-between gap-4 flex-wrap">
+      <div class="flex items-center gap-1.5 flex-wrap" role="group" aria-label="Filter projects by technology">
+        <span class="text-xs font-mono text-slate-400 mr-1 hidden sm:inline">Filter:</span>
+        {filterOptions.map((tag) => (
+          <button
+            type="button"
+            data-filter={tag}
+            class={`filter-btn px-3 py-1 text-xs font-medium rounded-full border transition-all ${
+              tag === 'All'
+                ? 'bg-slate-900 dark:bg-indigo-600 text-white border-slate-900 dark:border-indigo-600 active'
+                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
+            }`}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+
+      <div class="text-xs font-mono text-slate-500 dark:text-slate-400">
+        Showing <span id="project-count" class="font-bold text-slate-900 dark:text-slate-100">{sortedProjects.length}</span> projects
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects Grid -->
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2" id="projects-container">
+    {sortedProjects.map((project) => {
+      const allTags = [...project.data.technologies, project.data.category].join(',').toLowerCase();
+      return (
+        <div
+          class="project-item transition-all duration-200"
+          data-technologies={allTags}
+        >
+          <ProjectCard
+            title={project.data.title}
+            slug={project.slug}
+            description={project.data.description}
+            category={project.data.category}
+            date={project.data.date}
+            technologies={project.data.technologies}
+            githubUrl={project.data.githubUrl}
+            liveUrl={project.data.liveUrl}
+            metrics={project.data.metrics}
+            featured={project.data.featured}
+          />
+        </div>
+      );
+    })}
+  </div>
+
+  <!-- Empty State when filter yields 0 -->
+  <div id="no-projects-msg" class="hidden py-16 text-center">
+    <p class="text-base font-semibold text-slate-800 dark:text-slate-200">No matching projects found</p>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Try selecting another technology tag.</p>
+    <button
+      id="reset-filter-btn"
+      type="button"
+      class="mt-4 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+    >
+      Reset Filters
+    </button>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  const buttons = document.querySelectorAll('.filter-btn');
+  const items = document.querySelectorAll('.project-item');
+  const countEl = document.getElementById('project-count');
+  const emptyMsg = document.getElementById('no-projects-msg');
+  const resetBtn = document.getElementById('reset-filter-btn');
+
+  function applyFilter(selected) {
+    let visibleCount = 0;
+    const filterKey = selected.toLowerCase().trim();
+
+    items.forEach((item) => {
+      const tags = item.getAttribute('data-technologies') || '';
+      const matches =
+        filterKey === 'all' ||
+        tags.includes(filterKey) ||
+        (filterKey === 'spring boot' && tags.includes('spring'));
+
+      if (matches) {
+        item.classList.remove('hidden');
+        visibleCount++;
+      } else {
+        item.classList.add('hidden');
+      }
+    });
+
+    if (countEl) countEl.textContent = String(visibleCount);
+
+    if (emptyMsg) {
+      if (visibleCount === 0) {
+        emptyMsg.classList.remove('hidden');
+      } else {
+        emptyMsg.classList.add('hidden');
+      }
+    }
+
+    buttons.forEach((btn) => {
+      const btnFilter = btn.getAttribute('data-filter');
+      if (btnFilter === selected) {
+        btn.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
+        btn.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
+      } else {
+        btn.classList.remove('bg-slate-900', 'text-white', 'border-slate-900');
+        btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+      }
+    });
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tag = btn.getAttribute('data-filter') || 'All';
+      applyFilter(tag);
+      const url = new URL(window.location);
+      if (tag === 'All') {
+        url.searchParams.delete('tag');
+      } else {
+        url.searchParams.set('tag', tag);
+      }
+      window.history.replaceState({}, '', url);
+    });
+  });
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => applyFilter('All'));
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialTag = urlParams.get('tag');
+  if (initialTag) {
+    applyFilter(initialTag);
+  }
+</script>

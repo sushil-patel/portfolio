@@ -1,0 +1,290 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Badge from '../components/Badge.astro';
+import { siteConfig } from '../config/site';
+import { getRelativePath } from '../utils/url';
+---
+
+<BaseLayout
+  seo={{
+    title: 'Resume & Curriculum Vitae | Sushil Patel',
+    description: 'Verified curriculum vitae of Sushil Patel, Software Developer and Module Lead at TCS with 3 years of enterprise software experience.',
+  }}
+>
+  <Breadcrumbs items={[{ name: 'Resume' }]} />
+
+  <div class="max-w-4xl mx-auto">
+    <!-- Top Action Bar for Recruiters -->
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/70 dark:bg-indigo-950/30 p-4 sm:p-5">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
+          <span class="font-bold text-sm text-indigo-950 dark:text-indigo-100">Curriculum Vitae</span>
+        </div>
+        <p class="text-xs text-indigo-900 dark:text-indigo-200 mt-0.5">
+          Download the authentic PDF copy or review the clean, crawlable HTML version below.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <a
+          href={getRelativePath(siteConfig.resumePath)}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>Download PDF Resume</span>
+        </a>
+
+        <button
+          type="button"
+          onclick="window.print()"
+          class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+        >
+          <svg class="h-4 w-4 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          <span>Print</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Paper CV Container -->
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-12 shadow-sm font-sans text-slate-800 dark:text-slate-200" id="resume-document">
+      <!-- Resume Header -->
+      <div class="border-b border-slate-200 dark:border-slate-800 pb-6 text-center sm:text-left flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white sm:text-4xl">
+            {siteConfig.name}
+          </h1>
+          <p class="mt-1 text-base font-semibold text-indigo-700 dark:text-indigo-400 font-mono">
+            Software Developer · Module Lead
+          </p>
+        </div>
+
+        <div class="flex flex-col text-xs font-mono text-slate-600 dark:text-slate-400 sm:text-right space-y-1">
+          <div>{siteConfig.location}</div>
+          <div>
+            <a href={`mailto:${siteConfig.email}`} class="text-slate-900 dark:text-slate-100 hover:underline">{siteConfig.email}</a>
+          </div>
+          <div>{siteConfig.phone}</div>
+          <div class="pt-1 flex sm:justify-end gap-3 text-indigo-600 dark:text-indigo-400 font-semibold">
+            <a href={siteConfig.social.github} target="_blank" rel="noopener noreferrer" class="hover:underline">GitHub</a>
+            <span>·</span>
+            <a href={siteConfig.social.linkedin} target="_blank" rel="noopener noreferrer" class="hover:underline">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Professional Summary -->
+      <section class="mt-6 border-b border-slate-100 dark:border-slate-800 pb-6">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">
+          Professional Summary
+        </h2>
+        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+          Java Developer with 3 years of experience building and maintaining enterprise applications using Java, Spring
+          Boot, REST APIs, IBM MQ, Redis, and SQL, backend performance optimization, event-driven processing,
+          production troubleshooting, secure coding, and mentoring engineers.
+        </p>
+      </section>
+
+      <!-- Professional Experience -->
+      <section class="mt-6 border-b border-slate-100 dark:border-slate-800 pb-6">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-4">
+          Professional Experience
+        </h2>
+
+        <div>
+          <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between">
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">
+              Software Developer — Java Developer — Module Lead
+            </h3>
+            <span class="text-xs font-mono text-slate-500 dark:text-slate-400 font-medium">Oct 2023 – Present</span>
+          </div>
+          <div class="text-xs font-semibold text-indigo-700 dark:text-indigo-400 font-mono mt-0.5">
+            Tata Consultancy Services (TCS) Limited
+          </div>
+
+          <ul class="mt-3 space-y-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300 list-disc list-outside ml-4 leading-relaxed">
+            <li>
+              Leading a module of 4 engineers, driving application design, code reviews, mentoring, and cross-functional delivery with QA and client teams.
+            </li>
+            <li>
+              Reduced batch processing time by 50% by optimizing Java batch workflows through parallel execution, Redis-based caching, and efficient task partitioning for high-volume workloads.
+            </li>
+            <li>
+              Contributed to the design and development of high-throughput, event-driven backend services processing 800K+ records in under 20 minutes using file-splitting techniques and IBM MQ, with fault handling and performance optimization.
+            </li>
+            <li>
+              Contributed to Redis-based rate limiting and JWT authentication using Spring Boot, helping reduce peak-period server load by 30% and strengthen access control.
+            </li>
+            <li>
+              Contributed to automated inbound file processing using scheduled Spring Boot jobs and SFTP, with validation, retry mechanisms, and alerting to reduce manual intervention.
+            </li>
+            <li>
+              Supported migration of legacy MD5 password storage to BCrypt, including backward-compatible password rehashing to strengthen credential security.
+            </li>
+            <li>
+              Troubleshot production issues through log analysis and root-cause investigation, implementing preventive fixes that improved application reliability and operational stability by roughly 25%.
+            </li>
+            <li>
+              Built maintainable applications following SOLID principles, SonarQube quality gates, automated testing, secure coding practices and enterprise standards.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Projects -->
+      <section class="mt-6 border-b border-slate-100 dark:border-slate-800 pb-6">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-4">
+          Projects
+        </h2>
+
+        <!-- Project 1 -->
+        <div class="mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">
+              Artifact Comparison &amp; Deployment Validation Tool
+            </h3>
+            <span class="text-xs font-mono text-slate-500 dark:text-slate-400">Feb 2026 – Present</span>
+          </div>
+          <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+            Tech Stack: Java, Spring Boot, SHA-256, File I/O
+          </div>
+          <ul class="mt-2 space-y-1.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 list-disc list-outside ml-4 leading-relaxed">
+            <li>Developed a Java/Spring Boot tool to automate staging-vs-production artifact validation using recursive directory traversal and SHA-256 hashing.</li>
+            <li>Reduced large-deployment comparison time from 2 hours to 30 seconds (240x faster), eliminating manual folder-by-folder binary comparison.</li>
+            <li>Independently initiated the solution to address a deployment validation bottleneck; subsequently adopted by TCS for artifact comparison across multiple clients.</li>
+            <li>Extending the tool with multithreaded artifact comparison and GitLab integration to correlate changed files with recent staging-branch changes and generate a consolidated validation report.</li>
+          </ul>
+        </div>
+
+        <!-- Project 2 -->
+        <div>
+          <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">
+              Claimora – Mock Insurance Claim Processing Platform
+            </h3>
+            <span class="text-xs font-mono text-slate-500 dark:text-slate-400">Apr 2026 – Present</span>
+          </div>
+          <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+            Tech Stack: Java, Spring Boot, Spring Security, JPA/Hibernate, MySQL, REST APIs, Kafka
+          </div>
+          <ul class="mt-2 space-y-1.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 list-disc list-outside ml-4 leading-relaxed">
+            <li>Built a Spring Boot backend to manage end-to-end insurance claim lifecycle including claim submission, validation, and status tracking across multiple claim types.</li>
+            <li>Implemented secure RESTful APIs with role-based access control using Spring Security (JWT), supporting distinct workflows for claimants, reviewers, and admins.</li>
+            <li>Designed the relational database schema including entities, relationships, constraints, indexes, and JPA mappings for the claims platform, improving query performance by approximately 30%.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Technical Skills Matrix -->
+      <section class="mt-6 border-b border-slate-100 dark:border-slate-800 pb-6">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-3">
+          Technical Skills
+        </h2>
+
+        <div class="space-y-2 text-xs sm:text-sm">
+          <div>
+            <span class="font-bold text-slate-900 dark:text-white">Languages: </span>
+            <span class="text-slate-700 dark:text-slate-300">Java 8/17/21, SQL, Python, Bash / Shell Scripting</span>
+          </div>
+          <div>
+            <span class="font-bold text-slate-900 dark:text-white">Backend: </span>
+            <span class="text-slate-700 dark:text-slate-300">Spring Boot, Spring MVC, Spring Security, Spring Data JPA, Hibernate, REST APIs, Microservices</span>
+          </div>
+          <div>
+            <span class="font-bold text-slate-900 dark:text-white">Distributed Systems: </span>
+            <span class="text-slate-700 dark:text-slate-300">IBM MQ, MDB/EJB, Kafka, Redis, Event-Driven Architecture, Asynchronous Processing</span>
+          </div>
+          <div>
+            <span class="font-bold text-slate-900 dark:text-white">Databases: </span>
+            <span class="text-slate-700 dark:text-slate-300">Oracle, MySQL</span>
+          </div>
+          <div>
+            <span class="font-bold text-slate-900 dark:text-white">Testing &amp; Tools: </span>
+            <span class="text-slate-700 dark:text-slate-300">JUnit, Mockito, Maven, Git, Jenkins, SonarQube, Postman, IntelliJ IDEA, Eclipse</span>
+          </div>
+          <div>
+            <span class="font-bold text-slate-900 dark:text-white">Cloud: </span>
+            <span class="text-slate-700 dark:text-slate-300">AWS (EC2, S3)</span>
+          </div>
+          <div>
+            <span class="font-bold text-slate-900 dark:text-white">Core Concepts: </span>
+            <span class="text-slate-700 dark:text-slate-300">OOP, SOLID, Multithreading, Concurrency, Design Patterns, DSA, JWT, OAuth2</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Education -->
+      <section class="mt-6 border-b border-slate-100 dark:border-slate-800 pb-6">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-3">
+          Education
+        </h2>
+        <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between text-xs sm:text-sm">
+          <div>
+            <span class="font-bold text-slate-900 dark:text-white">L. D. College of Engineering, Ahmedabad</span>
+            <span class="text-slate-600 dark:text-slate-400 block">Bachelor of Engineering (B.E.)</span>
+          </div>
+          <div class="text-left sm:text-right font-mono mt-1 sm:mt-0">
+            <span class="text-slate-500 dark:text-slate-400">Jul 2019 – Apr 2023</span>
+            <span class="text-slate-900 dark:text-white font-bold block">CGPA 8.71</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Certifications & Achievements with Clickable Links -->
+      <section class="mt-6">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-3">
+          Certifications &amp; Achievements
+        </h2>
+        <ul class="space-y-1.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 list-disc list-outside ml-4">
+          <li>
+            <a href="https://www.credly.com/badges/e4ada754-02de-4034-b39f-f14e4cfb744b/public_url" target="_blank" rel="noopener noreferrer" class="hover:underline font-semibold text-indigo-700 dark:text-indigo-400">
+              AWS Certified Developer – Associate
+            </a> (Amazon Web Services)
+          </li>
+          <li>
+            <a href="https://drive.google.com/file/d/11i7DbeSJLYFWrWZQZjYd5j4-2Q9PKLGL/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="hover:underline font-semibold text-indigo-700 dark:text-indigo-400">
+              1st Runner Up
+            </a> – TCS AI Fridays Hackathon Mumbai Regional Finals
+          </li>
+          <li>
+            <a href="https://drive.google.com/file/d/1Jez0qSIcG5J8J-3Zljt1l_Us44KgzOZA/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="hover:underline font-semibold text-indigo-700 dark:text-indigo-400">
+              High Impact Team Award
+            </a> – TCS
+          </li>
+          <li>
+            <a href="https://drive.google.com/file/d/1npEbi9OugfGsAOussC5GophyES2B_Fp1/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="hover:underline font-semibold text-indigo-700 dark:text-indigo-400">
+              Top 10%
+            </a> – AI4ICPS Program, TCS x IIT Kharagpur
+          </li>
+          <li>
+            <a href="https://drive.google.com/file/d/1BNBiEoSLWRjRj-MdM-4zeOQ2D_OM5lqE/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="hover:underline font-semibold text-indigo-700 dark:text-indigo-400">
+              Special Initiative Award
+            </a> – TCS
+          </li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  @media print {
+    header, footer, nav, #project-filters, button, a[href*="resume.pdf"] {
+      display: none !important;
+    }
+    #resume-document {
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      color: #000 !important;
+      background: #fff !important;
+    }
+  }
+</style>
