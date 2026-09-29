@@ -29,7 +29,7 @@ portfolio/
 ├── public/
 │   ├── favicon.svg             # Modern vector brandmark favicon
 │   ├── robots.txt              # Search crawler instructions
-│   ├── resume.pdf              # Authentic official resume PDF
+│   ├── SushilPatel.pdf              # Authentic official resume PDF
 │   └── images/
 │       ├── og-image.svg        # 1200x630 vector Open Graph card
 │       └── og-image.png        # Rendered high-res social preview image

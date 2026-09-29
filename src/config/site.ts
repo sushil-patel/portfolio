@@ -45,7 +45,7 @@ export const siteConfig = {
     linkedin: 'https://linkedin.com/in/sushil-patel-',
     email: 'mailto:mrsushilpatel2001@gmail.com',
   },
-  resumePath: '/resume.pdf',
+  resumePath: '/SushilPatel.pdf',
 
   navItems: [
     { title: 'Home', href: '/' },
