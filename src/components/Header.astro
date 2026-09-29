@@ -4,8 +4,13 @@ import { getRelativePath } from '../utils/url';
 
 const currentPath = Astro.url.pathname;
 const isCurrent = (href: string) => {
-  if (href === '/') return currentPath === '/';
-  return currentPath.startsWith(href);
+  const target = getRelativePath(href);
+  if (href === '/') {
+    const cleanTarget = target.replace(/\/+$/, '');
+    const cleanCurrent = currentPath.replace(/\/+$/, '');
+    return cleanCurrent === cleanTarget;
+  }
+  return currentPath.startsWith(target);
 };
 ---
 

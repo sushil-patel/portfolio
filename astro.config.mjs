@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 
 // Central configuration: easily customizable or overridden via environment variables
 const SITE_URL = process.env.SITE_URL || 'https://sushil-patel.github.io';
-const BASE_PATH = process.env.BASE_PATH || '/';
+const BASE_PATH = process.env.BASE_PATH || '/portfolio';
 
 // https://astro.build/config
 export default defineConfig({

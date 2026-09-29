@@ -33,7 +33,7 @@ export const siteConfig = {
   headline: 'Building reliable distributed systems, scalable backend services, and high-performance developer tooling.',
   shortBio: 'Software Developer & Module Lead at Tata Consultancy Services (TCS) with 3 years of enterprise experience building robust backend architectures, distributed services, and automated release validation tools.',
   siteUrl: 'https://sushil-patel.github.io',
-  basePath: '/',
+  basePath: '/portfolio',
   email: 'mrsushilpatel2001@gmail.com',
   phone: '+91-9157139239',
   location: 'India',

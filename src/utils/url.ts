@@ -1,21 +1,35 @@
 import { siteConfig } from '../config/site';
 
 /**
- * Returns a fully qualified absolute URL using the configured site URL.
- * Automatically handles trailing and leading slashes.
+ * Returns a fully qualified absolute URL using the configured site URL and base path.
+ * Automatically handles base path, trailing and leading slashes.
  */
 export function getAbsoluteUrl(path: string = '/'): string {
-  const base = siteConfig.siteUrl.replace(/\/+$/, '');
-  const cleanPath = path.replace(/^\/+/, '');
-  return cleanPath ? `${base}/${cleanPath}` : base;
+  const domain = siteConfig.siteUrl.replace(/\/+$/, '');
+  const relative = getRelativePath(path);
+  const cleanRelative = relative.replace(/^\/+/, '');
+  return cleanRelative ? `${domain}/${cleanRelative}` : domain;
 }
 
 /**
  * Returns an internal path prefixed with the configured base path.
- * Useful for GitHub Pages subdirectory deployments if ever configured with a subpath.
+ * Handles subpath deployments (e.g. GitHub Pages /portfolio/) and prevents duplicate prefixing.
  */
 export function getRelativePath(path: string = '/'): string {
-  const basePath = siteConfig.basePath === '/' ? '' : siteConfig.basePath.replace(/\/+$/, '');
+  const base = siteConfig.basePath === '/' ? '' : siteConfig.basePath.replace(/\/+$/, '');
+
+  if (!base) {
+    return path.startsWith('/') ? path : `/${path}`;
+  }
+
+  // If path already starts with the base path, return as is
+  if (path === base || path.startsWith(`${base}/`)) {
+    return path;
+  }
+
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `${basePath}${cleanPath}` || '/';
+  if (cleanPath === '/') {
+    return `${base}/`;
+  }
+  return `${base}${cleanPath}`;
 }

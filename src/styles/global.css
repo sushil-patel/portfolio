@@ -100,3 +100,43 @@
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+
+/* Dark mode prose high-contrast visibility overrides */
+.dark .prose {
+  color: #cbd5e1;
+}
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4 {
+  color: #f8fafc;
+}
+.dark .prose p,
+.dark .prose li {
+  color: #cbd5e1;
+}
+.dark .prose strong {
+  color: #ffffff;
+}
+.dark .prose a {
+  color: #818cf8;
+}
+.dark .prose a:hover {
+  color: #a5b4fc;
+}
+.dark .prose code:not(pre code) {
+  color: #c7d2fe;
+  background-color: #1e293b;
+}
+.dark .prose blockquote {
+  border-left-color: #475569;
+  color: #94a3b8;
+}
+.dark .prose hr {
+  border-color: #1e293b;
+}
+.dark .prose th,
+.dark .prose td {
+  color: #cbd5e1;
+  border-color: #334155;
+}
